@@ -1,25 +1,21 @@
 import asyncio
 import logging
-from os import getenv
 
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
-from dotenv import load_dotenv
 
+from bot.config import BOT_TOKEN, DEBUG
 from bot.db.models import async_main
-from bot.handlers import router
-
-# Set False at the production
-DEBUG = True
+from bot.handlers import start_router, tasks_router
 
 
 # Main function
-async def main():
-	load_dotenv()
+async def start_bot():
 	await async_main()
-	bot = Bot(getenv('BOT_TOKEN'), default=DefaultBotProperties(parse_mode='markdown'))
+	bot = Bot(BOT_TOKEN, default=DefaultBotProperties(parse_mode='markdown'))
 	dp = Dispatcher()
-	dp.include_router(router)
+	dp.include_router(start_router)
+	dp.include_router(tasks_router)
 	await dp.start_polling(bot)
 
 
@@ -28,6 +24,8 @@ if __name__ == '__main__':
 	try:
 		if DEBUG:
 			logging.basicConfig(level=logging.INFO)
-		asyncio.run(main())
+		asyncio.run(start_bot())
+	except Exception as e:
+		logging.error(f'An error occurred: {e}')
 	except KeyboardInterrupt:
 		print('Shutdown')

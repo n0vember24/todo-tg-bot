@@ -1,14 +1,11 @@
+from typing import Literal
+
 from aiogram.fsm.state import State, StatesGroup
 
 
 class Task(StatesGroup):
-	title = State()
-	description = State()
-	user_id = State()
-
-
-class TaskEdit(StatesGroup):
-	task_id = State()
-	title = State()
-	description = State()
-	user_id = State()
+	task_id: int = State()
+	status: Literal['creating', 'editing'] = State()
+	title: str = State()
+	description: str = State()
+	user_id: int = State()
