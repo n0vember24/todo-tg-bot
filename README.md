@@ -1,5 +1,5 @@
 # ToDo Bot - Open Source Telegram bot project
-
+[![wakatime](https://wakatime.com/badge/user/b805ecb4-4a3d-4805-815f-410bf2e510c9/project/d08980b1-043e-4231-909f-270f22fb9637.svg)](https://wakatime.com/badge/user/b805ecb4-4a3d-4805-815f-410bf2e510c9/project/d08980b1-043e-4231-909f-270f22fb9637)
 ## Usage
 
 * Clone this repository into your local machine.
@@ -26,7 +26,7 @@ python -m virtualenv .venv
 pip install -r requirements.txt
 ```
 
-* Then, create new .env file and set all necessary variables there
+* Then, create new .env file in root folder and set all necessary variables there
 
 ```python
 # How it should look like:

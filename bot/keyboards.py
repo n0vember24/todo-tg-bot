@@ -1,14 +1,12 @@
 from aiogram.utils.keyboard import (InlineKeyboardMarkup, InlineKeyboardButton, InlineKeyboardBuilder,
                                     ReplyKeyboardMarkup, KeyboardButton)
 
-from bot.db.requests import get_tasks, get_task
+from bot.db.requests import TaskManager
 
-main = InlineKeyboardMarkup(inline_keyboard=[
-	[
+main = InlineKeyboardMarkup(inline_keyboard=[[
 		InlineKeyboardButton(text='📝 Мои задачи', callback_data='my_tasks'),
 		InlineKeyboardButton(text='🖋 Добавить задачу', callback_data='add_task'),
-	]
-])
+]])
 
 cancel = ReplyKeyboardMarkup(keyboard=[
 	[KeyboardButton(text='❌ Отмена')]],
@@ -16,15 +14,28 @@ cancel = ReplyKeyboardMarkup(keyboard=[
 	one_time_keyboard=True
 )
 
+cancel_empty = ReplyKeyboardMarkup(keyboard=[
+	[KeyboardButton(text='🗒 Оставить пустым'), KeyboardButton(text='❌ Отмена')]],
+	resize_keyboard=True,
+	one_time_keyboard=True
+)
+
 cancel_edit = ReplyKeyboardMarkup(keyboard=[
-	[KeyboardButton(text='❌ Отмена'), KeyboardButton(text='📌 Оставить текущее')]],
+	[KeyboardButton(text='📌 Оставить текущее'), KeyboardButton(text='❌ Отмена')]],
+	resize_keyboard=True,
+	one_time_keyboard=True
+)
+
+cancel_edit_empty = ReplyKeyboardMarkup(keyboard=[
+	[KeyboardButton(text='🗒 Оставить пустым'), KeyboardButton(text='📌 Оставить текущее')],
+	[KeyboardButton(text='❌ Отмена')]],
 	resize_keyboard=True,
 	one_time_keyboard=True
 )
 
 
 async def get_user_tasks(user_id: int):
-	tasks = await get_tasks(user_id)
+	tasks = await TaskManager.get_by_user(user_id)
 	keyboard = InlineKeyboardBuilder()
 	for task in tasks:
 		status = '✅' if task.is_done else '❌'
@@ -38,7 +49,7 @@ async def get_user_tasks(user_id: int):
 
 async def task_view_settings(task_id: int):
 	keyboard = InlineKeyboardBuilder()
-	task = await get_task(task_id)
+	task = await TaskManager.get(task_id)
 	status = '✅ Выполнено' if task.is_done else '❌ Не выполнено'
 	keyboard.add(
 		InlineKeyboardButton(text=status, callback_data=f'change_task_status_{task_id}'),
@@ -56,3 +67,4 @@ async def delete_task_confirmation(task_id: int):
 		InlineKeyboardButton(text='↩️ Отмена', callback_data=f'task_{task_id}'),
 	)
 	return keyboard.adjust(2).as_markup()
+

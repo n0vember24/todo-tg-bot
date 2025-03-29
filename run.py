@@ -6,7 +6,7 @@ from aiogram.client.default import DefaultBotProperties
 
 from bot.config import BOT_TOKEN, DEBUG
 from bot.db.models import async_main
-from bot.handlers import start_router, tasks_router
+from bot.handlers import start_router, tasks_router, admin_router
 
 
 # Main function
@@ -16,6 +16,7 @@ async def start_bot():
 	dp = Dispatcher()
 	dp.include_router(start_router)
 	dp.include_router(tasks_router)
+	dp.include_router(admin_router)
 	await dp.start_polling(bot)
 
 

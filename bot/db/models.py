@@ -1,14 +1,13 @@
 from datetime import datetime
-from os import getenv
 
-from dotenv import load_dotenv
-from sqlalchemy import Integer, BigInteger, TIMESTAMP, String, Boolean, ForeignKey
+from sqlalchemy import Integer, BigInteger, DateTime, String, Boolean, ForeignKey, func
 from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
-load_dotenv()
-engine = create_async_engine(url=getenv('DB_ENGINE'))
-async_session = async_sessionmaker(engine)
+from bot.config import DB_ENGINE
+
+engine = create_async_engine(url=DB_ENGINE)
+async_session = async_sessionmaker(engine, expire_on_commit=False)
 
 
 # Base model
@@ -20,7 +19,7 @@ class User(Base):
 	__tablename__ = 'users'
 	id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
 	tg_id: Mapped[int] = mapped_column(BigInteger, unique=True, nullable=False)
-	join_date: Mapped[datetime] = mapped_column(TIMESTAMP, default=datetime.utcnow, nullable=False)
+	join_date: Mapped[datetime] = mapped_column(DateTime, default=func.now(), nullable=False)
 	tasks: Mapped[list['Task']] = relationship(back_populates='user', cascade='all, delete')
 
 

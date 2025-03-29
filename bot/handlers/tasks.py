@@ -6,10 +6,10 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
 
-import bot.db.requests as rq
 import bot.keyboards as kb
 from bot.filters import StatusFilter
 from bot.states import Task as TaskState
+from bot.db.requests import TaskManager
 
 router = Router()
 
@@ -69,7 +69,7 @@ async def cancel_task(msg: Message, state: FSMContext):
 		task_id = await state.get_value('task_id', None)
 
 		if task_id:
-			task = await rq.get_task(task_id)
+			task = await TaskManager.get(task_id)
 
 			if task:
 				await msg.answer(cancel_text, reply_markup=ReplyKeyboardRemove())
@@ -93,17 +93,19 @@ async def cancel_task(msg: Message, state: FSMContext):
 async def add_task_title(msg: Message, state: FSMContext):
 	await state.update_data(title=msg.text)
 	await state.set_state(TaskState.description)
-	await msg.answer('✏️ Введите описание задачи, отправьте точку чтобы оставить пустым.', reply_markup=kb.cancel)
+	await msg.answer(
+		'✏️ Введите описание задачи.',
+		reply_markup=kb.cancel_empty)
 
 
 @router.message(TaskState.description, StatusFilter('creating'))
 async def add_task_description(msg: Message, state: FSMContext):
-	await state.update_data(description=msg.text)
-	data = await state.get_data()
-	user_id = msg.from_user.id
-	desc = '' if data.get('description', '.') == '.' else data['description']
 	try:
-		task = await rq.create_task(data.get('title'), desc, user_id)
+		user_id = msg.from_user.id
+		desc = msg.text if msg.text != '🗒 Оставить пустым' else ''
+		data = await state.get_data()
+		task = TaskManager(user_id, data.get('title'), desc)
+		await task.create()
 		await msg.answer('🎉 Задача добавлена', reply_markup=ReplyKeyboardRemove())
 		await msg.answer('Вот ваши задачи 👇', reply_markup=await kb.get_user_tasks(user_id))
 	except Exception as e:
@@ -118,7 +120,7 @@ async def add_task_description(msg: Message, state: FSMContext):
 async def view_task(cb: CallbackQuery):
 	try:
 		task_id = int(cb.data.split('_')[-1])
-		task = await rq.get_task(task_id)
+		task = await TaskManager.get(task_id)
 		txt = f'*{task.title}*\n\n{task.description}'
 		await cb.message.edit_text(txt, reply_markup=await kb.task_view_settings(task_id))
 	except Exception as e:
@@ -130,7 +132,7 @@ async def view_task(cb: CallbackQuery):
 async def change_task_status(cb: CallbackQuery):
 	try:
 		task_id = int(cb.data.split('_')[-1])
-		await rq.change_task_stat(task_id)
+		await TaskManager(task_id=task_id).toggle_status()
 		await cb.answer('Успешно изменено!', show_alert=True)
 		await cb.message.edit_reply_markup(reply_markup=await kb.task_view_settings(task_id))
 	except Exception as e:
@@ -154,7 +156,7 @@ async def delete_task(cb: CallbackQuery):
 async def delete_task_confirm(cb: CallbackQuery):
 	try:
 		task_id = int(cb.data.split('_')[-1])
-		await rq.delete_task(task_id)
+		await TaskManager(task_id=task_id).delete()
 		await cb.answer('Успешно удалено!', show_alert=True)
 		await cb.message.edit_text('Выберите задачу 👇', reply_markup=await kb.get_user_tasks(cb.from_user.id))
 	except Exception as e:
@@ -166,7 +168,7 @@ async def delete_task_confirm(cb: CallbackQuery):
 async def edit_task(cb: CallbackQuery, state: FSMContext):
 	try:
 		task_id = int(cb.data.split('_')[-1])
-		task = await rq.get_task(task_id)
+		task = await TaskManager.get(task_id)
 		await state.set_state(TaskState.title)
 		await state.update_data(
 			task_id=task.id,
@@ -190,8 +192,9 @@ async def edit_task_title(msg: Message, state: FSMContext):
 		data = await state.get_data()
 		txt = f'Введите новое описание 👇\n\nТекущее: _{data.get('description')}_'
 	else:
-		txt = 'Оставлен текущий заголовок\nВведите новое описание задачи или отправьте точку чтобы оставить пустым.'
-	await msg.answer(txt, reply_markup=kb.cancel_edit)
+		data = await state.get_data()
+		txt = f'Оставлен текущий заголовок\nВведите новое описание задачи.\n\nТекущее: _{data.get('description')}_'
+	await msg.answer(txt, reply_markup=kb.cancel_edit_empty)
 	await state.set_state(TaskState.description)
 
 
@@ -199,12 +202,13 @@ async def edit_task_title(msg: Message, state: FSMContext):
 async def edit_task_description(msg: Message, state: FSMContext):
 	try:
 		if msg.text != '📌 Оставить текущее':
-			await state.update_data(description=msg.text if msg.text != '.' else '')
+			await state.update_data(description=msg.text if msg.text != '🗒 Оставить пустым' else '')
 		data = await state.get_data()
 		task_id = data.get('task_id')
 		task_title = data.get('title')
 		task_description = data.get('description')
-		await rq.update_task(task_id, task_title, task_description)
+		task = TaskManager(None, task_title, task_description, task_id)
+		await task.update()
 		await msg.answer('✅ Успешно сохранено!', reply_markup=ReplyKeyboardRemove())
 		await msg.answer(
 			f'*{task_title}*\n\n{task_description}',
