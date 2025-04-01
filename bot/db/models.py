@@ -12,7 +12,7 @@ async_session = async_sessionmaker(engine, expire_on_commit=False)
 
 # Base model
 class Base(AsyncAttrs, DeclarativeBase):
-	pass
+	"""Base class for models"""
 
 
 class User(Base):

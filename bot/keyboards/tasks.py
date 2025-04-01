@@ -9,7 +9,7 @@ async def get_user_tasks(user_id: int):
 	kb = InlineKeyboardBuilder()
 	for task in tasks:
 		status = '✅' if task.is_done else '❌'
-		kb.add(InlineKeyboardButton(text=f'{status} {task.title}', callback_data='task_%s' % task.id))
+		kb.add(InlineKeyboardButton(text=f'{status} {task.title}', callback_data=f'task_{task.id}'))
 	kb.add(
 		InlineKeyboardButton(text='🖋 Добавить задачу', callback_data='add_task'),
 		InlineKeyboardButton(text='↩️ Назад', callback_data='start')

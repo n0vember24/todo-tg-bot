@@ -8,7 +8,7 @@ load_dotenv()
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 DB_ENGINE = os.getenv('DB_ENGINE', 'sqlite+aiosqlite:///bot/db/db.sqlite3')
 DEBUG = os.getenv('DEBUG', 'False').lower() in ('true', '1')
-ADMINS = tuple(map(int, os.getenv('ADMINS', '0').split(',')))
+ADMINS = tuple(map(int, os.getenv('ADMINS', '0').strip().split(',')))
 
 # Checking variables' values
 if not BOT_TOKEN:
