@@ -12,12 +12,13 @@ class UserManager:
 	def __init__(self, user_id: int = None):
 		self.user_id = user_id
 
-	async def get_by_id(self) -> Optional[User]:
+	@staticmethod
+	async def get_by_id(user_id: int) -> Optional[User]:
 		"""Get user from database by id"""
 		try:
-			if self.user_id:
+			if user_id:
 				async with async_session() as session:
-					return await session.scalar(select(User).where(User.id == self.user_id))
+					return await session.scalar(select(User).where(User.id == user_id))
 			else:
 				raise ValueError('user_id is required')
 		except Exception as e:
@@ -66,9 +67,9 @@ class TaskManager:
 
 	def __init__(self, user_id: int = None, title: str = None, description: str = None, task_id: int = None):
 		self.user_id = user_id
-		self.task_id = task_id
 		self.title = title
 		self.description = description
+		self.task_id = task_id
 
 	@staticmethod
 	async def get(task_id: int) -> Optional[Task]:
@@ -107,7 +108,7 @@ class TaskManager:
 	async def create(self) -> None:
 		"""Create a new task by using given parameters"""
 		try:
-			async with async_session as session:
+			async with async_session() as session:
 				new_task = Task(title=self.title, description=self.description, user_id=self.user_id)
 				session.add(new_task)
 				await session.flush()
