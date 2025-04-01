@@ -7,6 +7,11 @@ from aiogram.types import Message, Update, CallbackQuery
 
 
 class ErrorHandler(BaseMiddleware):
+	"""
+	Middleware for all updates(Message/Callback).
+	Automatically check for error and keep running the bot
+	"""
+
 	async def __call__(
 			self, handler: Callable[[Message, Dict[str, Any]], Awaitable[Any]],
 			event: Update, data: Dict[str, Any]
@@ -14,7 +19,7 @@ class ErrorHandler(BaseMiddleware):
 		try:
 			return await handler(event, data)
 		except Exception as e:
-			logging.error(f'Error in {event}: {e}', exc_info=True)
+			logging.error('Error in %s: %s', event, e, exc_info=True)
 			state: FSMContext = data.get('state')
 			if state:
 				await state.clear()
