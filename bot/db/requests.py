@@ -22,7 +22,7 @@ class UserManager:
 			else:
 				raise ValueError('user_id is required')
 		except Exception as e:
-			logging.error(f'DB: error in getting user by id: {e}')
+			logging.error('DB: error in getting user by ID: %s', e)
 			return None
 
 	async def create(self) -> None:
@@ -39,7 +39,7 @@ class UserManager:
 			else:
 				raise ValueError('user_id is required')
 		except Exception as e:
-			logging.error(f'DB: error in creating new user: {e}')
+			logging.error('DB: error in creating new user: %s', e)
 
 	@staticmethod
 	async def get() -> list[User]:
@@ -48,7 +48,7 @@ class UserManager:
 			async with async_session() as session:
 				return list(await session.scalars(select(User)))
 		except Exception as e:
-			logging.error(f'DB: error in getting users: {e}')
+			logging.error('DB: error in getting users: %s', e)
 			return []
 
 	@staticmethod
@@ -58,7 +58,7 @@ class UserManager:
 			async with async_session() as session:
 				return await session.scalar(select(func.count()).select_from(User))
 		except Exception as e:
-			logging.error(f'DB: error in getting users count: {e}')
+			logging.error('DB: error in getting users count: %s', e)
 			return 0
 
 
@@ -78,7 +78,7 @@ class TaskManager:
 			async with async_session() as session:
 				return await session.scalar(select(Task).where(Task.id == task_id))
 		except Exception as e:
-			logging.error(f'DB: error in getting task by id: {e}')
+			logging.error('DB: error in getting task by id: %s', e)
 			return None
 
 	@staticmethod
@@ -88,7 +88,7 @@ class TaskManager:
 			async with async_session() as session:
 				return list(await session.scalars(select(Task).where(Task.user_id == user_id)))
 		except Exception as e:
-			logging.error(f'DB: error in getting tasks by user id: {e}')
+			logging.error('DB: error in getting tasks by user id: %s', e)
 			return []
 
 	@staticmethod
@@ -102,7 +102,7 @@ class TaskManager:
 				async with async_session() as session:
 					return await session.scalar(select(func.count()).select_from(Task))
 		except Exception as e:
-			logging.error(f'DB: error in getting tasks count: {e}')
+			logging.error('DB: error in getting tasks count: %s', e)
 			return 0
 
 	async def create(self) -> None:
@@ -114,7 +114,7 @@ class TaskManager:
 				await session.flush()
 				await session.commit()
 		except Exception as e:
-			logging.error(f'DB: error in creating new task: {e}')
+			logging.error('DB: error in creating new task: %s', e)
 
 	async def update(self) -> None:
 		"""Update task by using given parameters"""
@@ -126,7 +126,7 @@ class TaskManager:
 					task.description = self.description
 					await session.commit()
 		except Exception as e:
-			logging.error(f'DB: error in updating task: {e}')
+			logging.error('DB: error in updating task: %s', e)
 
 	async def delete(self) -> None:
 		"""Delete task by its :code:`id`"""
@@ -140,7 +140,7 @@ class TaskManager:
 			else:
 				raise ValueError('task_id is required')
 		except Exception as e:
-			logging.error(f'DB: error in deleting task: {e}')
+			logging.error('DB: error in deleting task: %s', e)
 
 	async def toggle_status(self) -> None:
 		"""Toggle task status by its :code:`id`"""
@@ -154,4 +154,4 @@ class TaskManager:
 			else:
 				raise ValueError('task_id is required')
 		except Exception as e:
-			logging.error(f'DB: error in changing task status: {e}')
+			logging.error('DB: error in changing task status: %s', e)
