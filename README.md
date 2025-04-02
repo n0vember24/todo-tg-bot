@@ -1,7 +1,9 @@
 # ToDo Bot - Open Source Telegram bot project
 
 [![wakatime](https://wakatime.com/badge/user/b805ecb4-4a3d-4805-815f-410bf2e510c9/project/d08980b1-043e-4231-909f-270f22fb9637.svg)](https://wakatime.com/badge/user/b805ecb4-4a3d-4805-815f-410bf2e510c9/project/d08980b1-043e-4231-909f-270f22fb9637)
-
+[![DeepSource](https://app.deepsource.com/gh/n0vember24/todo-tg-bot.svg/?label=active+issues&show_trend=true&token=Z29lcCx2K2Spwi1iKrUKj_9-)](https://app.deepsource.com/gh/n0vember24/todo-tg-bot/)
+[![DeepSource](https://app.deepsource.com/gh/n0vember24/todo-tg-bot.svg/?label=resolved+issues&show_trend=true&token=Z29lcCx2K2Spwi1iKrUKj_9-)](https://app.deepsource.com/gh/n0vember24/todo-tg-bot/)
+[![CodeFactor](https://www.codefactor.io/repository/github/n0vember24/todo-tg-bot/badge)](https://www.codefactor.io/repository/github/n0vember24/todo-tg-bot)
 ## Usage
 
 * Clone this repository into your local machine.

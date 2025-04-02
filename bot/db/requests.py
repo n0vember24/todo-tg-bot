@@ -18,14 +18,14 @@ class UserManager:
 		try:
 			if user_id:
 				async with async_session() as session:
-					return await session.scalar(select(User).where(User.id == user_id))
+					return await session.scalar(select(User).where(User.tg_id == user_id))
 			else:
 				raise ValueError('user_id is required')
 		except Exception as e:
 			logging.error('DB: error in getting user by ID: %s', e)
 			return None
 
-	async def create(self) -> None:
+	async def create(self) -> Optional[bool]:
 		"""Create a new user in database if it does not exist"""
 		try:
 			if self.user_id:
@@ -36,6 +36,8 @@ class UserManager:
 						session.add(new_user)
 						await session.flush()
 						await session.commit()
+						return True
+					return False
 			else:
 				raise ValueError('user_id is required')
 		except Exception as e:
