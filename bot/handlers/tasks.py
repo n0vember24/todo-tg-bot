@@ -47,7 +47,7 @@ async def cancel(msg: Message, state: FSMContext):
 	choose_operation_text = 'Выберите пункты ниже 👇'
 	if current_status == 'creating':
 		await msg.answer(cancel_text, reply_markup=ReplyKeyboardRemove())
-		await msg.answer(choose_operation_text, reply_markup=await kb.main(msg.from_user.id))
+		await msg.answer(choose_operation_text, reply_markup=kb.main)
 	elif current_status == 'editing':
 		task_id = await state.get_value('task_id', None)
 		if task_id:
@@ -59,13 +59,13 @@ async def cancel(msg: Message, state: FSMContext):
 					reply_markup=await kb.view_task_details(task))
 			else:
 				await msg.answer('❌ Задача не найдена', reply_markup=ReplyKeyboardRemove())
-				await msg.answer(choose_operation_text, reply_markup=await kb.main(msg.from_user.id))
+				await msg.answer(choose_operation_text, reply_markup=kb.main)
 		else:
 			await msg.answer('❌ Ошибка при обнаружении задачи', reply_markup=ReplyKeyboardRemove())
-			await msg.answer(choose_operation_text, reply_markup=await kb.main(msg.from_user.id))
+			await msg.answer(choose_operation_text, reply_markup=kb.main)
 	else:
 		await msg.answer('❌ Нет действия чтобы отменить.', reply_markup=ReplyKeyboardRemove())
-		await msg.answer(choose_operation_text, reply_markup=await kb.main(msg.from_user.id))
+		await msg.answer(choose_operation_text, reply_markup=kb.main)
 	await state.clear()
 
 
