@@ -1,9 +1,18 @@
-from aiogram.utils.keyboard import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton
+from aiogram.utils.keyboard import InlineKeyboardBuilder, InlineKeyboardButton, \
+	ReplyKeyboardMarkup, KeyboardButton
 
-main = InlineKeyboardMarkup(inline_keyboard=[[
-	InlineKeyboardButton(text='📝 Мои задачи', callback_data='my_tasks'),
-	InlineKeyboardButton(text='🖋 Добавить задачу', callback_data='add_task'),
-]])
+from bot.filters import IsBotAdmin
+
+
+async def main(user_id: int):
+	is_admin = IsBotAdmin(user_id)
+	kb = InlineKeyboardBuilder()
+	kb.add(InlineKeyboardButton(text='📝 Мои задачи', callback_data='my_tasks'),
+	       InlineKeyboardButton(text='🖋 Добавить задачу', callback_data='add_task'))
+	if is_admin:
+		kb.add(InlineKeyboardButton(text='👮‍♂️ Админ панель', callback_data='admin'))
+	return kb.adjust(2).as_markup()
+
 
 cancel = ReplyKeyboardMarkup(keyboard=[
 	[KeyboardButton(text='❌ Отмена')]],

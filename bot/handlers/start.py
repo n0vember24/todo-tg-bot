@@ -5,6 +5,7 @@ from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery
 
 import bot.keyboards as kb
+from bot.db.requests import UserManager
 
 router = Router()
 
@@ -16,6 +17,10 @@ async def start(msg_or_cb: Union[Message, CallbackQuery]):
 Я готов служить вам как ваш личный помощник в планировке задач и выполнения ваших целей!\n\n\
 Для начала работы выберите пункты ниже 👇'
 	if isinstance(msg_or_cb, Message):
-		await msg_or_cb.answer(start_text, reply_markup=kb.main)
+		user = UserManager(msg_or_cb.from_user.id)
+		await user.create()
+		await msg_or_cb.answer(
+			start_text, reply_markup=await kb.main(msg_or_cb.from_user.id))
 	else:
-		await msg_or_cb.message.edit_text('Выберите пункты ниже 👇', reply_markup=kb.main)
+		await msg_or_cb.message.edit_text(
+			'Выберите пункты ниже 👇', reply_markup=await kb.main(msg_or_cb.from_user.id))
