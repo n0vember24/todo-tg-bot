@@ -24,6 +24,6 @@ class ErrorHandler(BaseMiddleware):
 			if state:
 				await state.clear()
 			if isinstance(event, Message):
-				await event.message.answer('❌ Ошибка. Пожалуйства, попторите попытку ещё раз или позже.')
+				await event.answer('❌ Ошибка. Пожалуйства, попторите попытку ещё раз или позже.')
 			elif isinstance(event, CallbackQuery):
-				await event.callback_query.message.answer('❌ Ошибка. Пожалуйства, попторите попытку ещё раз или позже.')
+				await event.message.answer('❌ Ошибка. Пожалуйства, попторите попытку ещё раз или позже.')
