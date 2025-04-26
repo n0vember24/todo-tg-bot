@@ -6,3 +6,4 @@ db.sqlite3
 bin
 *coverage*
 tests.py
+todo.jpg

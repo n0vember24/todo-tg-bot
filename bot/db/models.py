@@ -17,8 +17,8 @@ class Base(AsyncAttrs, DeclarativeBase):
 
 class User(Base):
 	__tablename__ = 'users'
-	id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-	tg_id: Mapped[int] = mapped_column(BigInteger, unique=True, nullable=False)
+	id: Mapped[int] = mapped_column(Integer, primary_key=True)
+	tg_id: Mapped[BigInteger] = mapped_column(BigInteger, unique=True, nullable=False)
 	join_date: Mapped[datetime] = mapped_column(DateTime, default=func.now(), nullable=False)
 	tasks: Mapped[list['Task']] = relationship(back_populates='user', cascade='all, delete')
 
@@ -29,7 +29,7 @@ class Task(Base):
 	title: Mapped[str] = mapped_column(String(50), nullable=False)
 	description: Mapped[str] = mapped_column(String(200))
 	is_done: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
-	user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
+	user_id: Mapped[BigInteger] = mapped_column(BigInteger, ForeignKey('users.id'))
 	user: Mapped[User] = relationship(back_populates='tasks')
 
 
